@@ -29,6 +29,12 @@
     <!-- Template Main CSS File -->
     <link href="assets/css/style.css" rel="stylesheet">
 
+    <!-- Include Vue.js from CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- Include Axios from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <!-- =======================================================
     * Template Name: NiceAdmin
     * Updated: Jan 29 2024 with Bootstrap v5.3.2
@@ -85,7 +91,7 @@
 
 <main id="main" class="main">
 
-    <div class="container">
+    <div class="container" id="new-member">
 
         <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
             <div class="container">
@@ -100,10 +106,10 @@
                                     <h5 class="card-title text-center pb-0 fs-4">Create an Account</h5>
                                 </div>
 
-                                <form class="row g-3 needs-validation" novalidate>
+                                <form @submit.prevent="submitForm" class="row g-3 needs-validation" novalidate>
                                     <div class="col-12">
-                                        <label for="yourName" class="form-label">Your Account Name</label>
-                                        <input type="text" name="account" class="form-control" id="youraccount" required>
+                                        <label for="account" class="form-label">Your Account Name</label>
+                                        <input type="text" name="account" class="form-control" id="account" v-model="account" required>
                                         <div class="invalid-feedback">Please, enter your name!</div>
                                     </div>
 
@@ -139,6 +145,45 @@
 
 <!-- Template Main JS File -->
 <script src="assets/js/main.js"></script>
+
+
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                account: ''
+            }
+        },
+        methods: {
+            submitForm() {
+                // 檢查如果沒有輸入帳號，就不要送出
+                if (this.account === '') {
+                    alert('Please enter your account name!')
+                    return
+                }
+
+                const url = 'http://localhost:8080/api/member'
+                axios.post(url, {
+                    username: this.account
+                })
+                    .then(response => {
+                        alert(response.data.message)
+                        console.log(response.data.message)
+                        // 重新設定表單
+                        this.account = ''
+                    })
+                    .catch(error => {
+                        alert(response.data.message)
+                        console.log(error)
+                    })
+
+            }
+        }
+
+    })
+
+    app.mount('#new-member')
+</script>
 
 </body>
 
