@@ -154,7 +154,8 @@
                         <td>{{ index+1 }}</td>
                         <td>{{ transaction.username }}</td>
                         <td>{{ transaction.userCreateTime }}</td>
-                        <td>{{ transaction.type }}</td>
+                        <td v-if="transaction.type === newContract">新合約</td>
+                        <td v-else>續期</td>
                         <td>{{ transaction.borrowFee }}</td>
                         <td>{{ transaction.borrowFeeCreateTime }}</td>
                     </tr>
@@ -194,6 +195,7 @@
     const app = Vue.createApp({
         data() {
             return {
+                newContract: 1, // 新合約
                 startDate: '',
                 startTime: '',
                 endDate: '',
