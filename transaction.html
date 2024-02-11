@@ -29,6 +29,12 @@
     <!-- Template Main CSS File -->
     <link href="assets/css/style.css" rel="stylesheet">
 
+    <!-- Include Vue.js from CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- Include Axios from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <!-- =======================================================
     * Template Name: NiceAdmin
     * Updated: Jan 29 2024 with Bootstrap v5.3.2
@@ -85,7 +91,7 @@
 
 <main id="main" class="main">
 
-    <section class="section">
+    <section class="section" id="transaction">
         <div class="card">
             <div class="card-body">
 
@@ -94,38 +100,39 @@
                 <div class="row mb-3">
                     <label class="col-sm-2 col-form-label">選擇帳號</label>
                     <div class="col-sm-2">
-                        <select class="form-select" aria-label="Default select example">
-                            <option selected>全部</option>
-                            <option value="1">One</option>
-                            <option value="2">Two</option>
-                            <option value="3">Three</option>
+                        <select class="form-select" aria-label="Default select example" v-model="selectedMember">
+                            <option selected>All</option>
+                            <option v-for="member in members" :value="member.pk">{{ member.username }}</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="row mb-3">
-                    <label for="startDate" class="col-sm-2 col-form-label">選擇起始時間</label>
+                    <label class="col-sm-2 col-form-label">選擇起始時間</label>
                     <div class="col-sm-2">
-                        <input type="date" class="form-control">
+                        <input type="date" class="form-control" v-model="startDate">
                     </div>
                     <div class="col-sm-2">
-                        <input type="time" class="form-control">
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <label for="endDate" class="col-sm-2 col-form-label">選擇結束時間</label>
-                    <div class="col-sm-2">
-                        <input type="date" class="form-control">
-                    </div>
-                    <div class="col-sm-2">
-                        <input type="time" class="form-control">
+                        <input type="time" class="form-control" v-model="startTime">
                     </div>
                 </div>
 
                 <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label">選擇結束時間</label>
                     <div class="col-sm-2">
-                        <button type="button" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-return-right me-1"></i> Submit</button>
+                        <input type="date" class="form-control" v-model="endDate">
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="time" class="form-control" v-model="endTime">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-secondary btn-sm" @click="submit">
+                            <i class="bi bi-arrow-return-right me-1"></i>
+                            Submit
+                        </button>
                     </div>
                 </div>
 
@@ -133,6 +140,7 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
+                        <th scope="col">#</th>
                         <th scope="col">帳號</th>
                         <th scope="col">帳號註冊時間</th>
                         <th scope="col">業務類型</th>
@@ -141,41 +149,16 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td>TestUser_1</td>
-                        <td>2024-02-09 21:55:45</td>
-                        <td>新合约</td>
-                        <td>67.36</td>
-                        <td>2024-02-09 22:12:25</td>
+
+                    <tr v-for="(transaction,index) in transactions">
+                        <td>{{ index+1 }}</td>
+                        <td>{{ transaction.username }}</td>
+                        <td>{{ transaction.userCreateTime }}</td>
+                        <td>{{ transaction.type }}</td>
+                        <td>{{ transaction.borrowFee }}</td>
+                        <td>{{ transaction.borrowFeeCreateTime }}</td>
                     </tr>
-                    <tr>
-                        <td>TestUser_2</td>
-                        <td>2024-02-09 21:55:45</td>
-                        <td>续期</td>
-                        <td>67.36</td>
-                        <td>2024-02-09 22:12:25</td>
-                    </tr>
-                    <tr>
-                        <td>TestUser_3</td>
-                        <td>2024-02-09 21:55:45</td>
-                        <td>新合约</td>
-                        <td>67.36</td>
-                        <td>2024-02-09 22:12:25</td>
-                    </tr>
-                    <tr>
-                        <td>TestUser_4</td>
-                        <td>2024-02-09 21:55:45</td>
-                        <td>续期</td>
-                        <td>67.36</td>
-                        <td>2024-02-09 22:12:25</td>
-                    </tr>
-                    <tr>
-                        <td>TestUser_5</td>
-                        <td>2024-02-09 21:55:45</td>
-                        <td>新合约</td>
-                        <td>67.36</td>
-                        <td>2024-02-09 22:12:25</td>
-                    </tr>
+
                     </tbody>
                 </table>
                 <!-- End Bordered Table -->
@@ -199,6 +182,83 @@
 
 <!-- Template Main JS File -->
 <script src="assets/js/main.js"></script>
+
+<!--get 兩隻API -> 下拉選單+ table的紀錄-->
+
+<!--選擇條件後要進行搜尋動作-->
+<!--所有客戶(no) -> 選擇時間區間段(預設是整年)-->
+<!--個別客戶(id)-->
+<!--確認查詢時間區間段前端回傳值-->
+
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                startDate: '',
+                startTime: '',
+                endDate: '',
+                endTime: '',
+                selectedMember: 'All',
+                members: [],
+                transactions: []
+            }
+        },
+        created() {
+            // 取得一年前的時間
+            const start = new Date();
+            start.setFullYear(start.getFullYear() - 1);
+            this.startDate = start.toISOString().slice(0, 10);
+            this.startTime = start.toTimeString().slice(0, 5);
+
+            // 取得現在時間
+            const end = new Date();
+            this.endDate = end.toISOString().slice(0, 10);
+            this.endTime = end.toTimeString().slice(0, 5);
+        },
+        mounted() {
+            this.fetchMembers()
+            this.submit()
+        },
+        methods: {
+            fetchMembers() {
+                const url = 'http://localhost:8080/api/members'
+                axios.get(url)
+                    .then(response => {
+                        this.members = response.data.data
+                    })
+                    .catch(error => {
+                        alert(response.data.message)
+                    })
+
+            },
+            submit() {
+                let url = '';
+                let startDateTime = this.startDate + 'T' + this.startTime + ':00'
+                let endDateTime = this.endDate + 'T' + this.endTime + ':00';
+                let dateRange = '?start_datetime=' + startDateTime + '&end_datetime=' + endDateTime;
+
+                if (this.selectedMember === 'All') {
+                    url = 'http://localhost:8080/api/members/all/transactions' + dateRange;
+                } else {
+                    url = 'http://localhost:8080/api/members/' + this.selectedMember + '/transactions' + dateRange;
+                }
+
+                axios.get(url)
+                    .then(response => {
+                        this.transactions = response.data.data
+                    })
+                    .catch(error => {
+                        alert(response.data.message)
+                        console.log(error)
+                    })
+
+            }
+        }
+
+    })
+
+    app.mount('#transaction')
+</script>
 
 </body>
 
