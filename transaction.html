@@ -223,7 +223,7 @@
         },
         methods: {
             fetchMembers() {
-                const url = 'http://localhost:8080/api/members'
+                const url = 'http://ec2-35-78-182-210.ap-northeast-1.compute.amazonaws.com:3000/api/members'
                 axios.get(url)
                     .then(response => {
                         this.members = response.data.data
@@ -240,9 +240,9 @@
                 let dateRange = '?start_datetime=' + startDateTime + '&end_datetime=' + endDateTime;
 
                 if (this.selectedMember === 'All') {
-                    url = 'http://localhost:8080/api/members/all/transactions' + dateRange;
+                    url = 'http://ec2-35-78-182-210.ap-northeast-1.compute.amazonaws.com:3000/api/members/all/transactions' + dateRange;
                 } else {
-                    url = 'http://localhost:8080/api/members/' + this.selectedMember + '/transactions' + dateRange;
+                    url = 'http://ec2-35-78-182-210.ap-northeast-1.compute.amazonaws.com:3000/api/members/' + this.selectedMember + '/transactions' + dateRange;
                 }
 
                 axios.get(url)
