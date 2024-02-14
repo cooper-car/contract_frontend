@@ -1,2 +1,3 @@
-# contract_frontend
-write a contract service for frontend
+## tech stack
+- HTML
+- Vue(by cdn)
