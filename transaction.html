@@ -184,14 +184,14 @@
 <!-- Template Main JS File -->
 <script src="assets/js/main.js"></script>
 
-<!--get 兩隻API -> 下拉選單+ table的紀錄-->
-
-<!--選擇條件後要進行搜尋動作-->
-<!--所有客戶(no) -> 選擇時間區間段(預設是整年)-->
-<!--個別客戶(id)-->
-<!--確認查詢時間區間段前端回傳值-->
-
 <script>
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1 < 10) ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
+        const day = (date.getDate() < 10) ? '0' + date.getDate() : date.getDate();
+        return `${year}-${month}-${day}`;
+    }
+
     const app = Vue.createApp({
         data() {
             return {
@@ -209,13 +209,13 @@
             // 取得一年前的時間
             const start = new Date();
             start.setFullYear(start.getFullYear() - 1);
-            this.startDate = start.toISOString().slice(0, 10);
+            this.startDate = formatDate(start);
             this.startTime = start.toTimeString().slice(0, 5);
 
             // 取得現在時間
             const end = new Date();
-            this.endDate = end.toISOString().slice(0, 10);
-            this.endTime = end.toTimeString().slice(0, 5);
+            this.endDate = formatDate(end);
+            this.endTime = this.startTime;
         },
         mounted() {
             this.fetchMembers()
