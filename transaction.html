@@ -185,6 +185,8 @@
 <script src="assets/js/main.js"></script>
 
 <script>
+
+    const API_URL = 'http://ec2-35-78-182-210.ap-northeast-1.compute.amazonaws.com:3000'
     function formatDate(date) {
         const year = date.getFullYear();
         const month = (date.getMonth() + 1 < 10) ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
@@ -240,9 +242,9 @@
                 let dateRange = '?start_datetime=' + startDateTime + '&end_datetime=' + endDateTime;
 
                 if (this.selectedMember === 'All') {
-                    url = 'http://ec2-35-78-182-210.ap-northeast-1.compute.amazonaws.com:3000/api/members/all/transactions' + dateRange;
+                    url = `${API_URL}/api/members/all/transactions` + dateRange;
                 } else {
-                    url = 'http://ec2-35-78-182-210.ap-northeast-1.compute.amazonaws.com:3000/api/members/' + this.selectedMember + '/transactions' + dateRange;
+                    url = `${API_URL}/api/members/` + this.selectedMember + '/transactions' + dateRange;
                 }
 
                 axios.get(url)
