@@ -148,6 +148,7 @@
 
 
 <script>
+    const API_URL = 'http://ec2-35-78-182-210.ap-northeast-1.compute.amazonaws.com:3000'
     const app = Vue.createApp({
         data() {
             return {
@@ -162,7 +163,7 @@
                     return
                 }
 
-                const url = 'http://ec2-35-78-182-210.ap-northeast-1.compute.amazonaws.com:3000/api/member'
+                const url = `${API_URL}/api/member`
                 axios.post(url, {
                     username: this.account
                 })
